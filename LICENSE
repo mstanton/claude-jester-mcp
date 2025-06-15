@@ -1,0 +1,104 @@
+MIT License
+
+Copyright (c) 2024 Claude Desktop MCP Execution Project
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-Party Licenses
+
+This project includes or depends on third-party software with the following licenses:
+
+### MCP (Model Context Protocol) SDK
+- **License**: MIT License
+- **Copyright**: Anthropic PBC
+- **Source**: https://github.com/modelcontextprotocol/sdk
+
+### RestrictedPython
+- **License**: ZPL 2.1 (Zope Public License)
+- **Copyright**: Zope Foundation and Contributors
+- **Source**: https://github.com/plone/RestrictedPython
+
+### ASTeval
+- **License**: MIT License
+- **Copyright**: Matthew Newville
+- **Source**: https://github.com/newville/asteval
+
+### psutil
+- **License**: BSD 3-Clause License
+- **Copyright**: Giampaolo Rodola
+- **Source**: https://github.com/giampaolo/psutil
+
+### FastAPI
+- **License**: MIT License
+- **Copyright**: Sebastián Ramírez
+- **Source**: https://github.com/tiangolo/fastapi
+
+### Other Dependencies
+This project may include other open-source libraries. Please refer to their respective repositories for license information. All dependencies are used in compliance with their respective licenses.
+
+---
+
+## Attribution
+
+This project was inspired by and builds upon research and best practices from:
+
+- **Anthropic** - For Claude AI and the MCP protocol
+- **GitHub** - For Copilot research and AI-assisted programming insights
+- **OpenAI** - For foundational AI code generation research
+- **Academic Research Community** - For studies on AI safety and code validation
+
+## Contributing
+
+By contributing to this project, you agree that your contributions will be licensed under the MIT License. Please ensure that any third-party code or dependencies you add are compatible with the MIT License.
+
+## Commercial Use
+
+This software is free for commercial use under the MIT License. However, please note:
+
+1. **Claude Desktop** is a separate product by Anthropic with its own terms of service
+2. **MCP Protocol** usage should comply with Anthropic's MCP guidelines
+3. Any commercial applications should respect rate limits and usage policies of integrated services
+
+## Disclaimer
+
+This project is not officially affiliated with Anthropic PBC. "Claude" is a trademark of Anthropic PBC. This project provides tooling that integrates with Claude Desktop through the official MCP (Model Context Protocol) interface.
+
+The authors and contributors of this project are not responsible for:
+- Misuse of AI-generated code
+- Security vulnerabilities in executed code
+- Data loss or system damage from code execution
+- Violations of third-party terms of service
+
+Users are responsible for:
+- Reviewing AI-generated code before production use
+- Ensuring compliance with applicable laws and regulations
+- Maintaining appropriate security measures
+- Respecting intellectual property rights
+
+## Support
+
+For support, please:
+1. Check the documentation at [docs/](docs/)
+2. Search existing [GitHub Issues](https://github.com/your-username/claude-desktop-mcp-execution/issues)
+3. Review the [troubleshooting guide](docs/troubleshooting.md)
+4. Create a new issue if needed
+
+For security vulnerabilities, please see [SECURITY.md](SECURITY.md).

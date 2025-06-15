@@ -1,0 +1,319 @@
+[build-system]
+requires = ["hatchling>=1.13.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "claude-desktop-mcp-execution"
+version = "1.0.0"
+description = "Transform Claude Desktop into a thinking, testing, optimizing programming partner"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Claude MCP Team", email = "mcp@example.com"},
+]
+maintainers = [
+    {name = "Claude MCP Team", email = "mcp@example.com"},
+]
+keywords = [
+    "claude",
+    "mcp",
+    "code-execution", 
+    "ai-programming",
+    "quantum-debugging",
+    "developer-tools",
+    "anthropic"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Debuggers",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "mcp>=1.0.0",
+    "asyncio-mqtt>=0.13.0",
+    "multiprocess>=0.70.12",
+    "psutil>=5.9.0",
+    "pydantic>=2.0.0",
+    "python-json-logger>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+# Core optional features
+security = [
+    "RestrictedPython>=6.0",
+    "asteval>=0.9.28",
+]
+performance = [
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+]
+monitoring = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "websockets>=11.0.0",
+    "jinja2>=3.1.0",
+    "plotly>=5.0.0",
+    "matplotlib>=3.5.0",
+]
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.0.0",
+    "bandit>=1.7.0",
+    "safety>=2.3.0",
+]
+# Documentation
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocs-mermaid2-plugin>=1.0.0",
+]
+# Advanced ML features
+ml = [
+    "scikit-learn>=1.3.0",
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
+]
+# Jupyter integration
+jupyter = [
+    "jupyter>=1.0.0",
+    "ipython>=8.0.0",
+    "notebook>=6.5.0",
+]
+# Complete installation with all features
+all = [
+    "claude-desktop-mcp-execution[security,performance,monitoring,ml,jupyter]"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/claude-desktop-mcp-execution"
+Documentation = "https://claude-mcp-docs.example.com"
+Repository = "https://github.com/your-username/claude-desktop-mcp-execution.git"
+Issues = "https://github.com/your-username/claude-desktop-mcp-execution/issues"
+Changelog = "https://github.com/your-username/claude-desktop-mcp-execution/blob/main/CHANGELOG.md"
+
+[project.scripts]
+claude-mcp = "claude_mcp.cli:main"
+claude-mcp-server = "claude_mcp.mcp.server:main"
+claude-mcp-monitor = "claude_mcp.monitoring.dashboard:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claude_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/docs",
+    "/tests",
+    "/examples",
+    "/scripts",
+    "/*.md",
+    "/*.txt",
+    "/*.toml",
+    "/LICENSE",
+]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["claude_mcp"]
+
+# Flake8 configuration
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".venv",
+    ".mypy_cache",
+    ".pytest_cache"
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "multiprocess.*",
+    "RestrictedPython.*",
+    "asteval.*",
+    "plotly.*",
+    "sklearn.*",
+    "torch.*",
+    "transformers.*"
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src/claude_mcp",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-fail-under=80"
+]
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "security: marks tests as security-related",
+    "performance: marks tests as performance benchmarks",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__init__.py",
+    "*/conftest.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Bandit security linting
+[tool.bandit]
+exclude_dirs = ["tests", "build", "dist"]
+skips = ["B101", "B601"]
+
+# Ruff configuration (alternative to flake8)
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*" = ["S101"]  # allow assert in tests
+
+# Pre-commit hooks configuration
+[tool.pre-commit]
+repos = [
+    {
+        repo = "https://github.com/pre-commit/pre-commit-hooks",
+        rev = "v4.4.0",
+        hooks = [
+            {id = "trailing-whitespace"},
+            {id = "end-of-file-fixer"},
+            {id = "check-yaml"},
+            {id = "check-added-large-files"},
+            {id = "check-json"},
+            {id = "check-toml"},
+            {id = "check-merge-conflict"},
+            {id = "debug-statements"},
+        ]
+    },
+    {
+        repo = "https://github.com/psf/black",
+        rev = "23.7.0",
+        hooks = [{id = "black"}]
+    },
+    {
+        repo = "https://github.com/pycqa/isort",
+        rev = "5.12.0",
+        hooks = [{id = "isort", name = "isort (python)"}]
+    },
+    {
+        repo = "https://github.com/charliermarsh/ruff-pre-commit",
+        rev = "v0.0.280",
+        hooks = [{id = "ruff", args = ["--fix"]}]
+    },
+    {
+        repo = "https://github.com/pre-commit/mirrors-mypy",
+        rev = "v1.5.1",
+        hooks = [{id = "mypy", additional_dependencies = ["types-requests"]}]
+    }
+]
