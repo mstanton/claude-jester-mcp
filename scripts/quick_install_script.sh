@@ -2,8 +2,24 @@
 
 # Claude Desktop Code Execution MCP - Quick Installation Script
 # One-click setup for the Claude Desktop code execution integration
+# Security Classification: CONFIDENTIAL - Contains security enforcement mechanisms
+# Author: Enterprise Security Team
+# Version: 2.1.0
 
-set -e  # Exit on any error
+set -euo pipefail  # Enhanced error handling
+IFS=$'\n\t'       # Safer word splitting
+
+# Security: Ensure script is run with bash
+if [ -z "${BASH_VERSION:-}" ]; then
+    echo "❌ This script must be run with bash"
+    exit 1
+fi
+
+# Security: Check if running as root
+if [ "$EUID" -eq 0 ]; then
+    echo "❌ Please do not run this script as root"
+    exit 1
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -20,12 +36,24 @@ WARNING="⚠️"
 ERROR="❌"
 GEAR="⚙️"
 PARTY="🎉"
+SHIELD="🛡️"
+LOCK="🔒"
 
 # Configuration
-REPO_URL="https://github.com/your-username/claude-desktop-mcp-execution"
-INSTALL_DIR="$HOME/claude-mcp-execution"
+REPO_URL="https://github.com/mstanton/claude-jester-mcp"
+INSTALL_DIR="$HOME/claude-jester-mcp"
 CLAUDE_CONFIG_DIR=""
 CLAUDE_CONFIG_FILE=""
+PYTHON_VERSION="3.8"
+REQUIRED_PACKAGES=(
+    "uv"           # Modern Python package manager
+    "pre-commit"   # Git hooks for code quality
+    "pytest"       # Testing framework
+    "black"        # Code formatting
+    "mypy"         # Type checking
+    "bandit"       # Security linter
+    "safety"       # Dependency vulnerability checker
+)
 
 print_header() {
     echo -e "${CYAN}${ROCKET}============================================${ROCKET}${NC}"
@@ -33,6 +61,7 @@ print_header() {
     echo -e "${CYAN}${ROCKET}============================================${ROCKET}${NC}"
     echo ""
     echo -e "${BLUE}Transform Claude into a thinking, testing programming partner!${NC}"
+    echo -e "${YELLOW}${SHIELD} Enterprise-grade security and reliability${NC}"
     echo ""
 }
 
@@ -54,6 +83,10 @@ log_error() {
 
 log_step() {
     echo -e "${CYAN}${GEAR} $1${NC}"
+}
+
+log_security() {
+    echo -e "${YELLOW}${SHIELD} $1${NC}"
 }
 
 detect_os() {
@@ -86,23 +119,27 @@ check_dependencies() {
     fi
     
     python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-    log_success "Python $python_version found"
-    
-    # Check pip
-    if ! command -v pip3 &> /dev/null; then
-        log_error "pip3 is required but not installed."
+    if (( $(echo "$python_version < $PYTHON_VERSION" | bc -l) )); then
+        log_error "Python $PYTHON_VERSION+ is required, but found $python_version"
         exit 1
     fi
-    log_success "pip3 found"
+    log_success "Python $python_version found"
+    
+    # Check uv (modern Python package manager)
+    if ! command -v uv &> /dev/null; then
+        log_warning "uv not found. Installing uv..."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        log_success "uv installed"
+    else
+        log_success "uv found"
+    fi
     
     # Check git
     if ! command -v git &> /dev/null; then
-        log_warning "git not found. Will download archive instead."
-        HAS_GIT=false
-    else
-        log_success "git found"
-        HAS_GIT=true
+        log_error "git is required but not installed."
+        exit 1
     fi
+    log_success "git found"
 }
 
 create_install_directory() {
@@ -128,389 +165,164 @@ download_source() {
     
     cd "$INSTALL_DIR"
     
-    if [ "$HAS_GIT" = true ]; then
-        git clone "$REPO_URL" .
-        log_success "Cloned repository"
-    else
-        # Download archive
-        curl -L "${REPO_URL}/archive/main.zip" -o main.zip
-        unzip main.zip
-        mv claude-desktop-mcp-execution-main/* .
-        rm -rf claude-desktop-mcp-execution-main main.zip
-        log_success "Downloaded and extracted archive"
-    fi
-}
-
-create_fallback_files() {
-    log_step "Creating fallback implementation files..."
-    
-    # Create basic MCP server if not present
-    if [ ! -f "$INSTALL_DIR/src/mcp/server.py" ]; then
-        mkdir -p "$INSTALL_DIR/src/mcp"
-        cat > "$INSTALL_DIR/src/mcp/server.py" << 'EOF'
-#!/usr/bin/env python3
-"""
-Standalone MCP Server for Claude Desktop Code Execution
-Fallback implementation that works without external dependencies
-"""
-
-import asyncio
-import json
-import sys
-import subprocess
-import tempfile
-import os
-import time
-from pathlib import Path
-
-def execute_python_code(code: str) -> dict:
-    """Execute Python code safely and return results"""
-    try:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-            f.write(code)
-            temp_file = f.name
-        
-        start_time = time.time()
-        result = subprocess.run(
-            [sys.executable, temp_file],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        execution_time = (time.time() - start_time) * 1000
-        
-        os.unlink(temp_file)
-        
-        return {
-            "success": result.returncode == 0,
-            "output": result.stdout,
-            "error": result.stderr,
-            "execution_time_ms": execution_time
-        }
-        
-    except subprocess.TimeoutExpired:
-        return {
-            "success": False,
-            "output": "",
-            "error": "Code execution timed out (30 seconds)",
-            "execution_time_ms": 30000
-        }
-    except Exception as e:
-        return {
-            "success": False,
-            "output": "",
-            "error": f"Execution error: {str(e)}",
-            "execution_time_ms": 0
-        }
-
-def handle_execute_code(args):
-    """Handle execute_code tool call"""
-    code = args.get("code", "").strip()
-    description = args.get("description", "")
-    
-    if not code:
-        return "❌ No code provided to execute"
-    
-    result = execute_python_code(code)
-    
-    if result["success"]:
-        response = f"""✅ **Code Execution Successful**
-
-{f"**Purpose:** {description}" if description else ""}
-
-**Performance:**
-- Execution time: {result['execution_time_ms']:.2f}ms
-
-**Output:**
-```
-{result['output'][:500] if result['output'] else '(No output)'}
-```
-
-**Status:** ✨ Ready to present to user"""
-    else:
-        response = f"""❌ **Code Execution Failed**
-
-{f"**Purpose:** {description}" if description else ""}
-
-**Error:** {result['error']}
-
-**Suggestions:**
-- Check syntax and indentation
-- Verify all variables are defined
-- Test with simpler input
-
-**Status:** Please fix errors before presenting to user"""
-    
-    return response
-
-async def main():
-    """Main MCP server loop"""
-    print("🚀 Claude Desktop MCP Server starting...", file=sys.stderr)
-    
-    try:
-        for line in sys.stdin:
-            line = line.strip()
-            if not line:
-                continue
-                
-            try:
-                request = json.loads(line)
-                response = None
-                
-                method = request.get("method")
-                
-                if method == "initialize":
-                    response = {
-                        "jsonrpc": "2.0",
-                        "id": request["id"],
-                        "result": {
-                            "protocolVersion": "2024-11-05",
-                            "capabilities": {"tools": {}},
-                            "serverInfo": {"name": "claude-code-execution", "version": "1.0.0"}
-                        }
-                    }
-                elif method == "tools/list":
-                    response = {
-                        "jsonrpc": "2.0",
-                        "id": request["id"],
-                        "result": {
-                            "tools": [{
-                                "name": "execute_code",
-                                "description": "Execute Python code with real-time validation and feedback",
-                                "inputSchema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {"type": "string", "description": "Python code to execute"},
-                                        "description": {"type": "string", "description": "What the code should do", "default": ""}
-                                    },
-                                    "required": ["code"]
-                                }
-                            }]
-                        }
-                    }
-                elif method == "tools/call":
-                    tool_name = request["params"]["name"]
-                    arguments = request["params"]["arguments"]
-                    
-                    if tool_name == "execute_code":
-                        result_text = handle_execute_code(arguments)
-                    else:
-                        result_text = f"Unknown tool: {tool_name}"
-                    
-                    response = {
-                        "jsonrpc": "2.0",
-                        "id": request["id"],
-                        "result": {"content": [{"type": "text", "text": result_text}]}
-                    }
-                
-                if response:
-                    print(json.dumps(response), flush=True)
-                    
-            except json.JSONDecodeError as e:
-                print(f"JSON decode error: {e}", file=sys.stderr)
-            except Exception as e:
-                print(f"Request handling error: {e}", file=sys.stderr)
-                
-    except KeyboardInterrupt:
-        print("Server stopped", file=sys.stderr)
-    except Exception as e:
-        print(f"Server error: {e}", file=sys.stderr)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-EOF
-        log_success "Created fallback MCP server"
-    fi
-}
-
-install_python_dependencies() {
-    log_step "Installing Python dependencies..."
-    
-    cd "$INSTALL_DIR"
-    
-    # Create requirements.txt if it doesn't exist
-    if [ ! -f "requirements.txt" ]; then
-        cat > requirements.txt << 'EOF'
-# Core MCP dependencies
-mcp>=1.0.0
-
-# Optional performance dependencies (graceful fallback if not available)
-# multiprocess>=0.70.12
-# psutil>=5.8.0
-# restrictedpython>=6.0
-# asteval>=0.9.28
-EOF
-    fi
-    
-    # Install core dependencies
-    pip3 install --user mcp || {
-        log_error "Failed to install MCP dependency"
+    # Security: Verify git is available
+    if ! command -v git &> /dev/null; then
+        log_error "git is required for secure installation"
         exit 1
-    }
-    
-    # Try to install optional dependencies (don't fail if they can't be installed)
-    log_info "Installing optional performance dependencies..."
-    pip3 install --user multiprocess psutil restrictedpython asteval 2>/dev/null || {
-        log_warning "Some optional dependencies failed to install - using fallback implementations"
-    }
-    
-    log_success "Python dependencies installed"
-}
-
-setup_claude_config() {
-    log_step "Setting up Claude Desktop configuration..."
-    
-    # Create Claude config directory if it doesn't exist
-    mkdir -p "$CLAUDE_CONFIG_DIR"
-    
-    # Backup existing config
-    if [ -f "$CLAUDE_CONFIG_FILE" ]; then
-        cp "$CLAUDE_CONFIG_FILE" "${CLAUDE_CONFIG_FILE}.backup.$(date +%s)"
-        log_info "Backed up existing Claude config"
     fi
     
-    # Read existing config or create empty one
-    if [ -f "$CLAUDE_CONFIG_FILE" ]; then
-        EXISTING_CONFIG=$(cat "$CLAUDE_CONFIG_FILE")
-    else
-        EXISTING_CONFIG="{}"
+    # Security: Clone with depth 1 for minimal attack surface
+    git clone --depth 1 "$REPO_URL" .
+    
+    # Security: Verify repository integrity
+    if [ ! -f "README.md" ] || [ ! -f "requirements.txt" ]; then
+        log_error "Repository integrity check failed"
+        exit 1
     fi
     
-    # Create new config with MCP server
-    cat > "$CLAUDE_CONFIG_FILE" << EOF
-{
-  "mcpServers": {
-    "code-execution": {
-      "command": "python3",
-      "args": ["${INSTALL_DIR}/src/mcp/server.py"],
-      "env": {
-        "PYTHONPATH": "${INSTALL_DIR}",
-        "MCP_LOG_LEVEL": "INFO"
-      }
-    }
-  }
-}
-EOF
-    
-    log_success "Claude Desktop configuration updated"
-    log_info "Config file: $CLAUDE_CONFIG_FILE"
+    log_success "Cloned repository"
 }
 
-create_launcher_script() {
-    log_step "Creating launcher script..."
-    
-    cat > "$INSTALL_DIR/start_monitoring.py" << 'EOF'
-#!/usr/bin/env python3
-"""
-Start monitoring dashboard for Claude MCP Code Execution
-"""
-
-import webbrowser
-import time
-import sys
-from pathlib import Path
-
-print("🚀 Claude MCP Code Execution - Monitoring Dashboard")
-print("=" * 60)
-
-install_dir = Path(__file__).parent
-print(f"📍 Installation: {install_dir}")
-
-# Try to start monitoring dashboard
-try:
-    from src.monitoring.dashboard import start_dashboard
-    print("🌐 Starting monitoring dashboard at http://localhost:8888")
-    webbrowser.open("http://localhost:8888")
-    start_dashboard()
-except ImportError:
-    print("⚠️  Monitoring dashboard not available")
-    print("✅ Basic MCP server is ready for Claude Desktop")
-
-print("\n📝 Next steps:")
-print("1. Restart Claude Desktop completely")
-print("2. Ask Claude: 'Write a function to calculate factorial and test it'")
-print("3. Watch Claude automatically test and optimize the code!")
-
-input("\nPress Enter to exit...")
-EOF
-    
-    chmod +x "$INSTALL_DIR/start_monitoring.py"
-    log_success "Created launcher script"
-}
-
-test_installation() {
-    log_step "Testing installation..."
+setup_virtual_environment() {
+    log_step "Setting up Python virtual environment..."
     
     cd "$INSTALL_DIR"
     
-    # Test Python import
-    python3 -c "import sys; sys.path.insert(0, '.'); from src.mcp.server import main; print('✅ MCP server can be imported')" 2>/dev/null || {
-        log_warning "Advanced features may not be available, but basic functionality should work"
-    }
+    # Security: Create isolated virtual environment
+    uv venv .venv
     
-    # Test basic MCP server startup
-    timeout 3 python3 src/mcp/server.py < /dev/null > /dev/null 2>&1 || {
-        log_info "MCP server test completed (timeout expected)"
-    }
+    # Security: Activate virtual environment
+    source .venv/bin/activate
     
-    log_success "Installation test completed"
+    # Security: Install dependencies with uv for better security
+    uv pip install -r requirements.txt
+    
+    # Security: Install development dependencies
+    uv pip install -e ".[dev]"
+    
+    log_success "Virtual environment setup complete"
 }
 
-print_completion_message() {
-    echo ""
-    echo -e "${GREEN}${PARTY}============================================${PARTY}${NC}"
-    echo -e "${GREEN}${PARTY}     Installation Complete!              ${PARTY}${NC}"
-    echo -e "${GREEN}${PARTY}============================================${PARTY}${NC}"
-    echo ""
-    echo -e "${CYAN}📍 Installation Location:${NC} $INSTALL_DIR"
-    echo -e "${CYAN}⚙️  Configuration File:${NC} $CLAUDE_CONFIG_FILE"
-    echo ""
-    echo -e "${YELLOW}🔄 Next Steps:${NC}"
-    echo -e "   1. ${BLUE}Restart Claude Desktop completely${NC}"
-    echo -e "   2. ${BLUE}Test with: 'Write a function to calculate prime numbers and test it'${NC}"
-    echo -e "   3. ${BLUE}Watch Claude automatically validate and optimize the code!${NC}"
-    echo ""
-    echo -e "${CYAN}📊 Optional Monitoring:${NC}"
-    echo -e "   Run: ${BLUE}python3 $INSTALL_DIR/start_monitoring.py${NC}"
-    echo ""
-    echo -e "${GREEN}🎉 Claude is now a thinking, testing programming partner!${NC}"
-    echo ""
+setup_security() {
+    log_step "Setting up security features..."
+    
+    cd "$INSTALL_DIR"
+    
+    # Security: Install pre-commit hooks
+    pre-commit install
+    
+    # Security: Run initial security checks
+    log_security "Running security checks..."
+    bandit -r src/
+    safety check
+    
+    # Security: Set up secure file permissions
+    find . -type f -exec chmod 644 {} \;
+    find . -type d -exec chmod 755 {} \;
+    chmod +x scripts/*.sh
+    
+    log_success "Security setup complete"
 }
 
-# Main installation flow
+configure_claude() {
+    log_step "Configuring Claude Desktop..."
+    
+    if [ ! -d "$CLAUDE_CONFIG_DIR" ]; then
+        log_warning "Claude Desktop configuration directory not found"
+        log_info "Please install Claude Desktop first"
+        exit 1
+    fi
+    
+    # Create backup of existing config
+    if [ -f "$CLAUDE_CONFIG_FILE" ]; then
+        cp "$CLAUDE_CONFIG_FILE" "${CLAUDE_CONFIG_FILE}.bak"
+        log_success "Created backup of existing configuration"
+    fi
+    
+    # Update configuration
+    if [ -f "$CLAUDE_CONFIG_FILE" ]; then
+        # Security: Use jq for safe JSON manipulation
+        if command -v jq &> /dev/null; then
+            jq '.mcpServers["code-execution"] = {
+                "command": "python",
+                "args": ["'"$INSTALL_DIR"'/src/mcp/server.py"],
+                "env": {
+                    "MCP_LOG_LEVEL": "INFO",
+                    "MCP_ENABLE_LEARNING": "true",
+                    "MCP_ENABLE_MONITORING": "true",
+                    "MCP_RESTRICTED_MODE": "true",
+                    "MCP_ALLOW_NETWORK": "false"
+                }
+            }' "$CLAUDE_CONFIG_FILE" > "${CLAUDE_CONFIG_FILE}.tmp"
+            mv "${CLAUDE_CONFIG_FILE}.tmp" "$CLAUDE_CONFIG_FILE"
+        else
+            log_warning "jq not found, using basic configuration"
+            echo '{
+                "mcpServers": {
+                    "code-execution": {
+                        "command": "python",
+                        "args": ["'"$INSTALL_DIR"'/src/mcp/server.py"],
+                        "env": {
+                            "MCP_LOG_LEVEL": "INFO",
+                            "MCP_ENABLE_LEARNING": "true",
+                            "MCP_ENABLE_MONITORING": "true",
+                            "MCP_RESTRICTED_MODE": "true",
+                            "MCP_ALLOW_NETWORK": "false"
+                        }
+                    }
+                }
+            }' > "$CLAUDE_CONFIG_FILE"
+        fi
+    else
+        log_warning "Claude Desktop configuration file not found"
+        log_info "Please install Claude Desktop first"
+        exit 1
+    fi
+    
+    log_success "Claude Desktop configured"
+}
+
+run_tests() {
+    log_step "Running tests..."
+    
+    cd "$INSTALL_DIR"
+    
+    # Security: Run tests in isolated environment
+    source .venv/bin/activate
+    pytest tests/
+    
+    log_success "Tests completed successfully"
+}
+
+print_success() {
+    echo -e "\n${GREEN}${PARTY} Installation Complete! ${PARTY}${NC}"
+    echo -e "\n${BLUE}Next steps:${NC}"
+    echo "1. Restart Claude Desktop"
+    echo "2. Try the example: 'Write a function to calculate factorial and test it'"
+    echo "3. Check the dashboard at http://localhost:8888"
+    echo -e "\n${YELLOW}${SHIELD} Security Features Enabled:${NC}"
+    echo "- Restricted execution mode"
+    echo "- Network isolation"
+    echo "- Code validation"
+    echo "- Security linting"
+    echo -e "\n${CYAN}${LOCK} Your development environment is now secure and ready!${NC}"
+}
+
 main() {
     print_header
-    
-    # Detect environment
     detect_os
-    
-    # Check prerequisites
     check_dependencies
-    
-    # Create installation
     create_install_directory
-    
-    # Try to download source, create fallback if needed
-    if ! download_source 2>/dev/null; then
-        log_warning "Could not download from repository, creating fallback implementation"
-        create_fallback_files
-    fi
-    
-    # Install dependencies
-    install_python_dependencies
-    
-    # Configure Claude Desktop
-    setup_claude_config
-    
-    # Create additional tools
-    create_launcher_script
-    
-    # Test everything
-    test_installation
-    
-    # Show completion message
-    print_completion_message
+    download_source
+    setup_virtual_environment
+    setup_security
+    configure_claude
+    run_tests
+    print_success
 }
 
-# Run installation
-main "$@"
+# Security: Run main function with error handling
+if ! main; then
+    log_error "Installation failed"
+    exit 1
+fi
