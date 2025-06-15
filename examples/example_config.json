@@ -1,0 +1,484 @@
+{
+  "description": "Configuration examples for Claude Desktop MCP Execution",
+  "version": "1.0.0",
+  
+  "claude_desktop_configs": {
+    "minimal_config": {
+      "description": "Minimal configuration with basic code execution only",
+      "mcpServers": {
+        "code-execution": {
+          "command": "python",
+          "args": ["/path/to/claude-desktop-mcp-execution/src/mcp/server.py"],
+          "env": {
+            "PYTHONPATH": "/path/to/claude-desktop-mcp-execution",
+            "MCP_LOG_LEVEL": "INFO",
+            "MCP_RESTRICTED_MODE": "true",
+            "MCP_MAX_EXEC_TIME": "10.0",
+            "MCP_MAX_MEMORY_MB": "256"
+          }
+        }
+      }
+    },
+    
+    "full_featured_config": {
+      "description": "Full-featured configuration with all capabilities enabled",
+      "mcpServers": {
+        "code-execution": {
+          "command": "python",
+          "args": ["/path/to/claude-desktop-mcp-execution/src/mcp/server.py"],
+          "env": {
+            "PYTHONPATH": "/path/to/claude-desktop-mcp-execution",
+            "MCP_DEBUG": "false",
+            "MCP_LOG_LEVEL": "INFO",
+            "MCP_LOG_FILE": "/tmp/claude_mcp.log",
+            
+            "MCP_MAX_EXEC_TIME": "10.0",
+            "MCP_MAX_MEMORY_MB": "256",
+            "MCP_MAX_OUTPUT_SIZE": "10000",
+            "MCP_MAX_EXEC_PER_MIN": "30",
+            
+            "MCP_CACHE_SIZE": "1000",
+            "MCP_CACHE_TTL": "3600",
+            
+            "MCP_RESTRICTED_MODE": "true",
+            "MCP_ALLOW_NETWORK": "false",
+            "MCP_ALLOWED_IMPORTS": "math,random,datetime,json",
+            
+            "MCP_ENABLE_QUANTUM": "true",
+            "MCP_ENABLE_LEARNING": "true",
+            "MCP_ENABLE_MONITORING": "true"
+          }
+        }
+      }
+    },
+    
+    "development_config": {
+      "description": "Development configuration with debug features and relaxed security",
+      "mcpServers": {
+        "code-execution": {
+          "command": "python",
+          "args": ["/path/to/claude-desktop-mcp-execution/src/mcp/server.py"],
+          "env": {
+            "PYTHONPATH": "/path/to/claude-desktop-mcp-execution",
+            "MCP_DEBUG": "true",
+            "MCP_LOG_LEVEL": "DEBUG",
+            "MCP_LOG_FILE": "/tmp/claude_mcp_debug.log",
+            
+            "MCP_MAX_EXEC_TIME": "30.0",
+            "MCP_MAX_MEMORY_MB": "512",
+            "MCP_MAX_OUTPUT_SIZE": "50000",
+            "MCP_MAX_EXEC_PER_MIN": "60",
+            
+            "MCP_CACHE_SIZE": "2000",
+            "MCP_CACHE_TTL": "7200",
+            
+            "MCP_RESTRICTED_MODE": "false",
+            "MCP_ALLOW_NETWORK": "true",
+            
+            "MCP_ENABLE_QUANTUM": "true",
+            "MCP_ENABLE_LEARNING": "true",
+            "MCP_ENABLE_MONITORING": "true"
+          }
+        }
+      }
+    },
+    
+    "production_config": {
+      "description": "Production configuration with maximum security and reliability",
+      "mcpServers": {
+        "code-execution": {
+          "command": "python",
+          "args": ["/path/to/claude-desktop-mcp-execution/src/mcp/server.py"],
+          "env": {
+            "PYTHONPATH": "/path/to/claude-desktop-mcp-execution",
+            "MCP_DEBUG": "false",
+            "MCP_LOG_LEVEL": "WARNING",
+            "MCP_LOG_FILE": "/var/log/claude_mcp.log",
+            
+            "MCP_MAX_EXEC_TIME": "5.0",
+            "MCP_MAX_MEMORY_MB": "128",
+            "MCP_MAX_OUTPUT_SIZE": "5000",
+            "MCP_MAX_EXEC_PER_MIN": "15",
+            
+            "MCP_CACHE_SIZE": "500",
+            "MCP_CACHE_TTL": "1800",
+            
+            "MCP_RESTRICTED_MODE": "true",
+            "MCP_ALLOW_NETWORK": "false",
+            "MCP_ALLOWED_IMPORTS": "math,json",
+            
+            "MCP_ENABLE_QUANTUM": "false",
+            "MCP_ENABLE_LEARNING": "false",
+            "MCP_ENABLE_MONITORING": "true"
+          }
+        }
+      }
+    },
+    
+    "team_config": {
+      "description": "Team configuration with shared learning and audit logging",
+      "mcpServers": {
+        "code-execution": {
+          "command": "python",
+          "args": ["/path/to/claude-desktop-mcp-execution/src/mcp/server.py"],
+          "env": {
+            "PYTHONPATH": "/path/to/claude-desktop-mcp-execution",
+            "MCP_LOG_LEVEL": "INFO",
+            "MCP_LOG_FILE": "/shared/logs/claude_mcp_team.log",
+            
+            "MCP_MAX_EXEC_TIME": "15.0",
+            "MCP_MAX_MEMORY_MB": "384",
+            "MCP_MAX_OUTPUT_SIZE": "15000",
+            "MCP_MAX_EXEC_PER_MIN": "40",
+            
+            "MCP_CACHE_SIZE": "1500",
+            "MCP_CACHE_TTL": "2400",
+            
+            "MCP_RESTRICTED_MODE": "true",
+            "MCP_ALLOW_NETWORK": "false",
+            
+            "MCP_ENABLE_QUANTUM": "true",
+            "MCP_ENABLE_LEARNING": "true",
+            "MCP_ENABLE_MONITORING": "true",
+            
+            "MCP_TEAM_MODE": "true",
+            "MCP_SHARED_LEARNING_DIR": "/shared/claude_mcp_learning",
+            "MCP_AUDIT_LOGGING": "true"
+          }
+        }
+      }
+    }
+  },
+  
+  "environment_variables": {
+    "description": "Complete list of available environment variables",
+    "categories": {
+      "core_settings": {
+        "MCP_DEBUG": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Enable debug mode with verbose logging"
+        },
+        "MCP_LOG_LEVEL": {
+          "type": "string",
+          "default": "INFO",
+          "options": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+          "description": "Set logging level"
+        },
+        "MCP_LOG_FILE": {
+          "type": "string",
+          "default": null,
+          "description": "Path to log file (stderr if not set)"
+        }
+      },
+      
+      "execution_limits": {
+        "MCP_MAX_EXEC_TIME": {
+          "type": "float",
+          "default": "10.0",
+          "unit": "seconds",
+          "description": "Maximum execution time per code block"
+        },
+        "MCP_MAX_MEMORY_MB": {
+          "type": "integer",
+          "default": "256",
+          "unit": "megabytes",
+          "description": "Maximum memory usage per execution"
+        },
+        "MCP_MAX_OUTPUT_SIZE": {
+          "type": "integer",
+          "default": "10000",
+          "unit": "characters",
+          "description": "Maximum output length"
+        },
+        "MCP_MAX_EXEC_PER_MIN": {
+          "type": "integer",
+          "default": "30",
+          "description": "Rate limit: executions per minute"
+        }
+      },
+      
+      "caching": {
+        "MCP_CACHE_SIZE": {
+          "type": "integer",
+          "default": "1000",
+          "description": "Number of execution results to cache"
+        },
+        "MCP_CACHE_TTL": {
+          "type": "integer",
+          "default": "3600",
+          "unit": "seconds",
+          "description": "Cache time-to-live"
+        }
+      },
+      
+      "security": {
+        "MCP_RESTRICTED_MODE": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable restricted execution mode"
+        },
+        "MCP_ALLOW_NETWORK": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Allow network access in code execution"
+        },
+        "MCP_ALLOWED_IMPORTS": {
+          "type": "string",
+          "default": "",
+          "description": "Comma-separated list of allowed imports"
+        }
+      },
+      
+      "features": {
+        "MCP_ENABLE_QUANTUM": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable quantum debugging (parallel variant testing)"
+        },
+        "MCP_ENABLE_LEARNING": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable adaptive learning system"
+        },
+        "MCP_ENABLE_MONITORING": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable real-time monitoring dashboard"
+        }
+      },
+      
+      "team_features": {
+        "MCP_TEAM_MODE": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Enable team collaboration features"
+        },
+        "MCP_SHARED_LEARNING_DIR": {
+          "type": "string",
+          "default": null,
+          "description": "Directory for shared learning data"
+        },
+        "MCP_AUDIT_LOGGING": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Enable detailed audit logging"
+        }
+      }
+    }
+  },
+  
+  "performance_profiles": {
+    "fast": {
+      "description": "Optimized for speed with higher resource limits",
+      "settings": {
+        "MCP_MAX_EXEC_TIME": "30.0",
+        "MCP_MAX_MEMORY_MB": "512",
+        "MCP_CACHE_SIZE": "2000",
+        "MCP_ENABLE_QUANTUM": "true",
+        "MCP_MAX_EXEC_PER_MIN": "60"
+      }
+    },
+    
+    "balanced": {
+      "description": "Good balance of performance and safety",
+      "settings": {
+        "MCP_MAX_EXEC_TIME": "10.0",
+        "MCP_MAX_MEMORY_MB": "256",
+        "MCP_CACHE_SIZE": "1000",
+        "MCP_ENABLE_QUANTUM": "true",
+        "MCP_MAX_EXEC_PER_MIN": "30"
+      }
+    },
+    
+    "safe": {
+      "description": "Conservative limits for maximum safety",
+      "settings": {
+        "MCP_MAX_EXEC_TIME": "5.0",
+        "MCP_MAX_MEMORY_MB": "128",
+        "MCP_CACHE_SIZE": "500",
+        "MCP_ENABLE_QUANTUM": "false",
+        "MCP_MAX_EXEC_PER_MIN": "15"
+      }
+    }
+  },
+  
+  "security_profiles": {
+    "minimal": {
+      "description": "Basic security only - not recommended for production",
+      "settings": {
+        "MCP_RESTRICTED_MODE": "false",
+        "MCP_ALLOW_NETWORK": "true",
+        "MCP_ALLOWED_IMPORTS": ""
+      }
+    },
+    
+    "standard": {
+      "description": "Recommended security settings",
+      "settings": {
+        "MCP_RESTRICTED_MODE": "true",
+        "MCP_ALLOW_NETWORK": "false",
+        "MCP_ALLOWED_IMPORTS": "math,random,datetime,json,re,string"
+      }
+    },
+    
+    "maximum": {
+      "description": "Highest security - may limit functionality",
+      "settings": {
+        "MCP_RESTRICTED_MODE": "true",
+        "MCP_ALLOW_NETWORK": "false",
+        "MCP_ALLOWED_IMPORTS": "math,json",
+        "MCP_MAX_EXEC_TIME": "3.0",
+        "MCP_MAX_MEMORY_MB": "64"
+      }
+    }
+  },
+  
+  "platform_specific": {
+    "windows": {
+      "description": "Windows-specific configuration adjustments",
+      "settings": {
+        "MCP_LOG_FILE": "%TEMP%\\claude_mcp.log",
+        "path_separators": "Use forward slashes or raw strings for paths"
+      }
+    },
+    
+    "macos": {
+      "description": "macOS-specific configuration",
+      "claude_config_path": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "settings": {
+        "MCP_LOG_FILE": "/tmp/claude_mcp.log"
+      }
+    },
+    
+    "linux": {
+      "description": "Linux-specific configuration",
+      "claude_config_path": "~/.config/Claude/claude_desktop_config.json",
+      "settings": {
+        "MCP_LOG_FILE": "/tmp/claude_mcp.log"
+      }
+    }
+  },
+  
+  "use_cases": {
+    "individual_developer": {
+      "description": "Single developer using Claude for personal projects",
+      "recommended_profile": "balanced",
+      "key_features": ["quantum_debugging", "learning", "monitoring"]
+    },
+    
+    "team_development": {
+      "description": "Team of developers with shared learning",
+      "recommended_profile": "balanced",
+      "key_features": ["team_mode", "shared_learning", "audit_logging"],
+      "additional_settings": {
+        "MCP_TEAM_MODE": "true",
+        "MCP_SHARED_LEARNING_DIR": "/shared/claude_learning",
+        "MCP_AUDIT_LOGGING": "true"
+      }
+    },
+    
+    "enterprise_production": {
+      "description": "Enterprise production environment",
+      "recommended_profile": "safe",
+      "security_profile": "maximum",
+      "key_features": ["audit_logging", "monitoring"],
+      "additional_settings": {
+        "MCP_LOG_FILE": "/var/log/claude_mcp.log",
+        "MCP_AUDIT_LOGGING": "true",
+        "MCP_ENABLE_LEARNING": "false"
+      }
+    },
+    
+    "research_experimentation": {
+      "description": "Research environment with relaxed constraints",
+      "recommended_profile": "fast",
+      "security_profile": "minimal",
+      "key_features": ["quantum_debugging", "learning", "monitoring"],
+      "additional_settings": {
+        "MCP_DEBUG": "true",
+        "MCP_MAX_EXEC_TIME": "60.0",
+        "MCP_ALLOW_NETWORK": "true"
+      }
+    },
+    
+    "educational": {
+      "description": "Educational environment for teaching programming",
+      "recommended_profile": "safe",
+      "security_profile": "standard",
+      "key_features": ["learning", "monitoring"],
+      "additional_settings": {
+        "MCP_MAX_EXEC_TIME": "5.0",
+        "MCP_ENABLE_QUANTUM": "false",
+        "MCP_AUDIT_LOGGING": "true"
+      }
+    }
+  },
+  
+  "troubleshooting": {
+    "common_issues": {
+      "server_wont_start": {
+        "symptoms": ["MCP server fails to start", "Connection errors"],
+        "solutions": [
+          "Check Python path in configuration",
+          "Verify all dependencies are installed",
+          "Check log file for error details",
+          "Ensure correct file permissions"
+        ]
+      },
+      
+      "execution_timeouts": {
+        "symptoms": ["Code execution times out frequently"],
+        "solutions": [
+          "Increase MCP_MAX_EXEC_TIME",
+          "Optimize code for performance",
+          "Check system resource usage",
+          "Disable quantum debugging temporarily"
+        ]
+      },
+      
+      "memory_errors": {
+        "symptoms": ["Out of memory errors", "Process killed"],
+        "solutions": [
+          "Increase MCP_MAX_MEMORY_MB",
+          "Reduce data size in code",
+          "Check for memory leaks",
+          "Use generators instead of lists"
+        ]
+      },
+      
+      "security_violations": {
+        "symptoms": ["Code rejected for security reasons"],
+        "solutions": [
+          "Review allowed imports list",
+          "Check MCP_RESTRICTED_MODE setting",
+          "Avoid dangerous operations",
+          "Use safer alternatives"
+        ]
+      }
+    },
+    
+    "debug_configuration": {
+      "MCP_DEBUG": "true",
+      "MCP_LOG_LEVEL": "DEBUG",
+      "MCP_LOG_FILE": "/tmp/claude_mcp_debug.log",
+      "description": "Enable this for detailed debugging information"
+    }
+  },
+  
+  "migration_guides": {
+    "v0_9_to_v1_0": {
+      "breaking_changes": [
+        "Environment variables now use MCP_ prefix",
+        "Tool parameter names have changed",
+        "Configuration file format updated"
+      ],
+      "migration_steps": [
+        "Backup existing configuration",
+        "Update environment variable names",
+        "Test with simple code execution",
+        "Verify all features work correctly"
+      ]
+    }
+  }
+}
