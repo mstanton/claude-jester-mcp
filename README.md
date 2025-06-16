@@ -267,6 +267,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Open source community** for foundational tools and libraries
 - **Research community** for AI safety and code validation techniques
 
+## 📊 Monitoring Dashboard
+
+To start the monitoring dashboard, run the following command in your terminal:
+
+```bash
+claude-jester monitor
+```
+
+This will launch the dashboard at `http://localhost:8888`, providing real-time insights into execution statistics, performance trends, learning insights, and pattern recognition.
+
 ---
 
 <div align="center">
