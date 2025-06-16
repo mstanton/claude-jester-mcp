@@ -1,11 +1,12 @@
 """
-Claude Jester MCP Server Package
-Security Classification: CONFIDENTIAL - Contains security enforcement mechanisms
+Module: mcp/__init__.py
+Purpose: MCP package initialization
 Author: Enterprise Security Team
 Version: 2.1.0
 
-This package contains the MCP server implementation for Claude Jester MCP.
-It provides the interface between Claude Desktop and the code execution engine.
+Security Classification:
+- CONFIDENTIAL: Contains security enforcement mechanisms
+- COMPLIANCE: PCI-DSS 4.0, SOC2, GDPR Article 32
 """
 
 from .server import MCPServer

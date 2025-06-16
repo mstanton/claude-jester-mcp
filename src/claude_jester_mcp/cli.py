@@ -221,8 +221,10 @@ def monitor(
         
         # Start dashboard
         progress.update(task, advance=1, description="Starting dashboard...")
-        # TODO: Implement dashboard startup
-        
+        from .monitoring.monitoring_dashboard import MonitoringDashboard
+        dashboard = MonitoringDashboard()
+        dashboard.start(port=port)
+    
     console.print(f"[green]✅ Monitoring dashboard started at http://localhost:{port}[/green]")
     console.print("\n[bold]Available metrics:[/bold]")
     console.print("- Execution statistics")

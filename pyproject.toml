@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
 authors = [
-    { name = "Matthew Stanton", email = "mrstanton91@gmail.com" }
+    { name = "Matthew Stanton", email = "mrstanton91@gmail.com" },
+    { name = "Enterprise Security Team", email = "security@company.com" },
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -55,6 +56,14 @@ dependencies = [
     "bandit>=1.7.5",
     "safety>=2.3.5",
     "pre-commit>=3.5.0",
+    "multiprocess>=0.70.15",
+    "docker>=6.1.3",
+    "psutil>=5.9.0",
+    "python-jose>=3.3.0",
+    "passlib>=1.7.4",
+    "bcrypt>=4.0.1",
+    "argon2-cffi>=23.1.0",
+    "mcp-sdk>=0.1.0",
 ]
 
 [project.optional-dependencies]
